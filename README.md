@@ -1,7 +1,8 @@
 # How to Use:
 
 (1) Link to our GitHub Page
-https://emory-infovis-f21.github.io/m5-final-deliverables-asr/
+
+> https://emory-infovis-f21.github.io/m5-final-deliverables-asr/
 
 (2) Local system instructions
 > Navigate to this repo folder on your system. In the main directory (where this README is located)
