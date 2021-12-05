@@ -5,8 +5,11 @@ https://emory-infovis-f21.github.io/m5-final-deliverables-asr/
 
 (2) Local system instructions
 > Navigate to this repo folder on your system. In the main directory (where this README is located)
+
 > Run: python3 -m http.server 8888
+
 > Go to http://localhost:8888/
+
 > To see other pages not on index.html, simply go to http://localhost:8888/<file.html>
 > e.g. http://localhost:8888/randy.html
 
