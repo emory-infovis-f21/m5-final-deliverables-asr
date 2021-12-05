@@ -206,7 +206,7 @@
               "<tr><th>Confirmed Cases:</th><td>" + stateMetrics.Confirmed + "</td></tr>" +
               "</table>";
             return html;
-          });
+          }).style("background", "lightblue");
 
         svg.selectAll("path")
           .attr("fill", function(d) {
