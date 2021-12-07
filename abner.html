@@ -10,15 +10,17 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <h1>Hello World h1</h1>
+    <h1>Yearly AQI Value by State</h1>
 
 
     <svg id="bar_chart"></svg>
+
     <label for="state">Choose a state: </label>
-    <select name="state" id="state" onchange="consoleF()">
+    <select name="state" id="state" class="state">
       <option value="Alaska"> Alaska </option>
       <option value="Alabama"> Alabama </option>
       <option value="Arkansas"> Arkansas </option>
+      <option value="Georgia"> Georgia </option>
     </select>
 
     <script>
@@ -30,92 +32,228 @@
       var margin = {left:50, right:50, top:50, bottom:50};
       var parseDate = d3.timeParse("%Y");
       var yearArray = [2016, 2017, 2018, 2019, 2020]
+      var currentState = "Alaska";
 
-      function consoleF() {
-        console.log(document.getElementById('state').value)
-      }
+
+      const states = [
+        "Alaska",
+        "Alabama",
+        "Arkansas",
+        "Arizona",
+        "California",
+        "Colorado",
+        "Connecticut",
+        "District of Columbia",
+        "Delaware",
+        "Florida",
+        "Georgia",
+        "Hawaii",
+        "Iowa",
+        "Idaho",
+        "Illinois",
+        "Indiana",
+        "Kansas",
+        "Kentucky",
+        "Louisiana",
+        "Massachusetts",
+        "Maryland",
+        "Maine",
+        "Michigan",
+        "Minnesota",
+        "Missouri",
+        "Mississippi",
+        "Montana",
+        "North Carolina",
+        "North Dakota",
+        "Nebraska",
+        "New Hampshire",
+        "New Jersey",
+        "New Mexico",
+        "Nevada",
+        "New York",
+        "Ohio",
+        "Oklahoma",
+        "Oregon",
+        "Pennsylvania",
+        "Rhode Island",
+        "South Carolina",
+        "South Dakota",
+        "Tennessee",
+        "Texas",
+        "Utah",
+        "Virginia",
+        "Vermont",
+        "Washington",
+        "Wisconsin",
+        "West Virginia",
+        "Wyoming"
+      ];
+
       // Load the data
-      d3.csv("assets/data/aggregate_state.csv")
+      d3.csv("assets/data/aggregate_states.csv")
         .row (function (d) {
           return {
             date: parseDate(d.Year),
             state: d.STATE,
             aqi: Number(d.yearly_aqi_value)};
         })
-        .get(function (error, data){
-          if (error) {
-            throw error;
-          }
-          var minVal = d3.min(data, function(d){ return d.aqi; });
-          var maxVal = d3.max(data, function(d){ return d.aqi; });
-          var minDate = d3.min(data,function(d){ return d.date; });
-          var maxDate = d3.max(data,function(d){ return d.date; });
-          var redcolorscale = d3.scaleSequential(d3.interpolateReds).domain([minVal, maxVal]);
-          var tooltip = d3.select("body").append("div").style("opacity","0").style("position", "absolute");
+        .get(function (error, data) {
+                  if (error) {
+                    throw error;
+                  }
 
-          var y = d3.scaleLinear()
-            .domain([0,maxVal])
-            .range([height-2*margin.bottom, 0]);
-
-          // var x = d3.scaleTime()
-          //   .domain([minDate, maxDate])
-          //   .range([0, width]);
-
-          var x = d3.scaleBand()
-            .domain(yearArray)
-            .range([0, width])
-            .paddingInner((yearArray.length-1)*barGap / (width));
-
-          var yAxis = d3.axisLeft(y);
-          var xAxis = d3.axisBottom(x);
+                  initialize(0);
 
 
-          var svg = d3.select("#bar_chart")
-                  .attr("width", width).attr("height", height);
+                  function initialize(param) {
+                    console.log(data);
+                    // Setup the visualization before user interaction
+                    var minVal = d3.min(data.filter(function (d) {
+                      return d.state === currentState;
+                    }), function (d) {
+                      return d.aqi;
+                    });
 
-          var chartGroup = svg.append("g")
-                  .attr("transform", "translate("+margin.left+","+margin.top+")");
+                    var maxVal = d3.max(data.filter(function (d) {
+                      return d.state === currentState;
+                    }), function (d) {
+                      return d.aqi;
+                    });
+                    var minDate = d3.min(data.filter(function (d) {
+                      return d.state === currentState;
+                    }), function (d) {
+                      return d.date;
+                    });
+                    var maxDate = d3.max(data.filter(function (d) {
+                      return d.state === currentState;
+                    }), function (d) {
+                      return d.date;
+                    });
 
-          chartGroup.append("g").attr("class","y axis").call(yAxis);
-          chartGroup.append("g").attr("class","x axis")
-                  .attr("transform","translate(0,"+(height-2*margin.top)+")") // this should be just height
-                  .call(xAxis);
+                    var redcolorscale = d3.scaleSequential(d3.interpolateReds).domain([minVal, maxVal]);
+                    var tooltip = d3.select("body").append("div").style("opacity", "0").style("position", "absolute");
+
+                    // Populate the dropdown menu
+                    d3.select('select.state')
+                            .on('change', () => update())
+                            .selectAll('option')
+                            .data(states)
+                            .enter()
+                            .append('option')
+                            .attr('value', function (d) {
+                              return d;
+                            })
+                            .text(function (d) {
+                              return d;
+                            });
+
+                    var y = d3.scaleLinear()
+                            .domain([0, maxVal])
+                            .range([height - 2 * margin.bottom, 0]);
+
+                    // var x = d3.scaleTime()
+                    //   .domain([minDate, maxDate])
+                    //   .range([0, width]);
+
+                    var x = d3.scaleBand()
+                            .domain(yearArray)
+                            .range([0, width])
+                            .paddingInner((yearArray.length - 1) * barGap / (width));
+
+                    var yAxis = d3.axisLeft(y);
+                    var xAxis = d3.axisBottom(x);
 
 
-          chartGroup.selectAll("rect")
-                  .data(data)
-                  .enter()
-                  .append("rect") // Im assuming d is pollution amt
-                  .attr("height", function (d, i) { return d.aqi * barHeightMultiplier; })
-                  .attr("width", barWidth)
-                  .attr("fill", function(d,i) { return redcolorscale(d.aqi); })
-                  .attr("x", function(d,i) { return (barGap + barWidth) * i; })
-                  .attr("y", function(d,i) { return height - (d.aqi * barHeightMultiplier + 2 * margin.bottom ); })
-            .on("mouseover", function (d) {
-              tooltip.style("opacity", "1")
-              .style("left", d3.event.pageX+"px")
-              .style("top", d3.event.pageY+"px")
-              .style("background", "lightblue");
+                    var svg = d3.select("#bar_chart")
+                            .attr("width", width).attr("height", height);
 
-              tooltip.html("AQI: " + d.aqi);
-            })
-                  .on("mouseout", function () {
-                    tooltip.style("opacity", "0");
-                  });
+                    // check if I should remove everything
+                    console.log(param);
+                    if (param === 1) {
+                      svg.selectAll("*").remove();
+                    }
 
-          // This is trying to fix the y scaling of the bars
-          // chartGroup.selectAll("rect")
-          //         .data(data)
-          //         .enter()
-          //         .append("rect")
-          //         .attr("height", function (d, i) { return height - y(d.aqi)})
-          //         .attr("width", barWidth)
-          //         .attr("fill", function(d,i) { return redcolorscale(d.aqi); })
-          //         .attr("x", function(d,i) { return i * (x.bandwidth()); })
-          //         .attr("y", function(d,i) { return 0; });
 
-        })
+                    var chartGroup = svg.append("g")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+                    chartGroup.append("g").attr("class", "y axis").call(yAxis);
+                    chartGroup.append("g").attr("class", "x axis")
+                            .attr("transform", "translate(0," + (height - 2 * margin.top) + ")") // this should be just height
+                            .call(xAxis);
+                    chartGroup.append("text")
+                            .attr("class", "y text")
+                            .attr("x", -2*height/5)
+                            .attr("y", -2*margin.left/3)
+                            .attr("transform", "rotate(270)")
+                            .text("AQI");
+                    chartGroup.append("text")
+                            .attr("class", "x text")
+                            .attr("x", width/2)
+                            .attr("y", height - margin.top)
+                            .text("Year");
+
+
+                    chartGroup.selectAll("rect")
+                            .data(data.filter(function (d) {
+                              return d.state === currentState;
+                            }))
+                            .enter()
+                            .append("rect")
+                            .attr("height", function (d, i) {
+                              return d.aqi * barHeightMultiplier;
+                            })
+                            .attr("width", barWidth)
+                            .attr("fill", function (d, i) {
+                              return redcolorscale(d.aqi);
+                            })
+                            .attr("x", function (d, i) {
+                              return (barGap + barWidth) * i;
+                            })
+                            .attr("y", function (d, i) {
+                              return height - (d.aqi * barHeightMultiplier + 2 * margin.bottom);
+                            })
+                            .on("mouseover", function (d) {
+                              tooltip.style("opacity", "1")
+                                      .style("left", d3.event.pageX + "px")
+                                      .style("top", d3.event.pageY + "px")
+                                      .style("background", "lightblue");
+
+                              tooltip.html("AQI: " + d.aqi);
+                            })
+                            .on("mouseout", function () {
+                              tooltip.style("opacity", "0");
+                            });
+
+                    // This is trying to fix the y scaling of the bars
+                    chartGroup.selectAll("rect")
+                    .data(data.filter(function (d) {
+                      return d.state === currentState;
+                    }))
+                            .enter()
+                            .append("rect")
+                            .attr("height", function (d, i) { return height - y(d.aqi) })
+                            .attr("width", barWidth)
+                            .attr("fill", function(d,i) { return redcolorscale(d.aqi); })
+                            .attr("x", function(d,i) { return i * (x.bandwidth()); })
+                            .attr("y", function(d,i) { return 0; });
+
+                  }
+
+                  // Redraw the bar chart when a new state is selected
+                  function update() {
+                    // Randy Line 117
+                    console.log("I am in update()");
+                    currentState = document.getElementById('state').value;
+                    console.log(currentState);
+                    // d3.select("#bar_chart").remove();
+                    initialize(1);
+
+
+                  }
+                }
+
+        )
 
 
 
