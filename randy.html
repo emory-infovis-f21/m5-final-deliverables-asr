@@ -119,57 +119,63 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 			      .attr("height", "100%")
 			      .attr("fill", "#f3f3f3");
 
+
         information.append("svg:foreignObject")
             .attr("width", w/3)
             .attr("height", 20)
-            .attr("y", 10)
+            .attr("y", 15)
+            .append("xhtml:span")
+            .attr("id", `information`);
+            
+        information.append("svg:foreignObject")
+            .attr("width", w/3)
+            .attr("height", 20)
+            .attr("y", 45)
             .append("xhtml:span")
             .attr("id", `info-date`);
 
         information.append("svg:foreignObject")
             .attr("width", w/3)
             .attr("height", 20)
-            .attr("y", 40)
+            .attr("y", 65)
             .append("xhtml:span")
             .attr("id", `info-state`);
         
         information.append("svg:foreignObject")
             .attr("width", w/3)
             .attr("height", 20)
-            .attr("y", 70)
+            .attr("y", 85)
             .append("xhtml:span")
             .attr("id", `info-aqi`);
 
         information.append("svg:foreignObject")
             .attr("width", w/3)
             .attr("height", 20)
-            .attr("y", 100)
+            .attr("y", 105)
             .append("xhtml:span")
             .attr("id", `info-aqi-co`);
 
         information.append("svg:foreignObject")
             .attr("width", w/3)
             .attr("height", 20)
-            .attr("y", 130)
+            .attr("y", 125)
             .append("xhtml:span")
             .attr("id", `info-aqi-o3`);
 
         information.append("svg:foreignObject")
             .attr("width", w/3)
             .attr("height", 20)
-            .attr("y", 160)
+            .attr("y", 145)
             .append("xhtml:span")
             .attr("id", `info-co`);
         
         information.append("svg:foreignObject")
             .attr("width", w/3)
             .attr("height", 20)
-            .attr("y", 190)
+            .attr("y", 165)
             .append("xhtml:span")
             .attr("id", `info-o3`);
 
-
-        
 
         let breakdown = right_column
 		        .append("svg")
@@ -182,6 +188,16 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 			      .attr("width", "100%")
 			      .attr("height", "100%")
 			      .attr("fill", "#f3f3f3");
+
+        breakdown.append("svg:foreignObject")
+            .attr("width", w/3)
+            .attr("height", 20)
+            .attr("y", 15)
+            .append("xhtml:span")
+            .attr("id", `breakdown`);
+
+
+
         
         let bottom_panel = d3.select("body")
             .append("svg")
@@ -204,6 +220,8 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
           .attr("height", "100%")
           .attr("fill", "#f3f3f3");
           
+
+        
         citations.append("svg:foreignObject")
             .attr("width", w/3)
             .attr("height", 20)
@@ -300,20 +318,13 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .attr("d", path);
         }
 
+        function buildBars(state, data) {
+          
+        }
+
+
         // Display state history
         function buildState(state, data) {
-          /*
-          let svg2 = d3.select("body")
-            .append("svg")
-		        .attr("width", w)
-		        .attr("height", h/3);
-
-          svg2.append("rect")
-          .attr("width", "100%")
-          .attr("height", "100%")
-          .attr("fill", "#f3f3f3");
-          */
-
           const passedState = state.State_Fixed;
           const passedDate = state.Date;
           
@@ -355,9 +366,6 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
                 .attr("fill", function(d) {
                   const rate = specific_data[i].Mean_AQI
                   
-                  if (rate == undefined) {
-                        rate = -50;
-                  }
                   return colorMap(rate);
 
                 });
@@ -389,14 +397,12 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .attr("fill", function(d) {
                 const rate = getStateMetrics(stats, d.properties.name)[color];
                 
-                if (rate == undefined) {
-                    rate = -50;
-                }
                 return colorMap(rate);
             })
             .on("mouseover", function(d) {
               const stateMetrics = getStateMetrics(stats, d.properties.name);
 
+              d3.select("#information").text("INFORMATION");
               d3.select("#info-date").text("Date: " + stateMetrics.Date);
               d3.select("#info-state").text("State: " + stateMetrics.State_Fixed);
               d3.select("#info-aqi").text("Daily CO + O3 AQI (Mean): " + (+stateMetrics.Mean_AQI).toFixed(3));
@@ -405,8 +411,11 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
               d3.select("#info-co").text("Daily Max CO Conc. (Mean): " + (+stateMetrics.DM8CO_Concentration).toFixed(3) + " ppm");
               d3.select("#info-o3").text("Daily Max O3 Conc. (Mean): " + (+stateMetrics.DM8O3_Concentration).toFixed(3) + " ppm");
 
+              d3.select("#breakdown").text("POLLUTANTS BREAKDOWN");
+
             })
             .on("mouseout", function(d) {
+              d3.select("#information").text("");
               d3.select("#info-date").text("");
               d3.select("#info-state").text("");
               d3.select("#info-aqi").text("");
@@ -414,6 +423,9 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
               d3.select("#info-aqi-o3").text("");
               d3.select("#info-co").text("");
               d3.select("#info-o3").text("");
+
+              d3.select("#breakdown").text("");
+
             })
             .on("mousedown", function(event, d) {
               d3.select(this)
@@ -424,16 +436,19 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 
             })
             .on("mouseup", function(event, d) {
+              
               d3.select(this)
                 .style("fill", function(d) {
-                  const rate = getStateMetrics(stats, d.properties.name)[color];
-                
-                  if (rate == undefined) {
-                      rate = 15;
-                  }
-                  return colorMap(rate);
+
+                  //const rate = getStateMetrics(stats, d.properties.name)[color];
+                  //console.log(getStateMetrics(stats, d.properties.name));
+                  //return colorMap(rate);
+                  const rate = getStateMetrics(stats, d.properties.name);
+                  console.log(+rate.Date_Keys);
+                  return update(+rate.Date_Keys)
 
                 });
+                
               d3.selectAll('.state-hist').remove()
             });
         }
