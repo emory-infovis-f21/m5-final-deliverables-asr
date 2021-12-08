@@ -27,7 +27,6 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
   </head>
     
     <h1>Visualizing Invisible Human Byproducts: Air Pollution</h1>
-
     <script>
 
       Promise.all([
@@ -194,9 +193,21 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .attr("height", 20)
             .attr("y", 15)
             .append("xhtml:span")
-            .attr("id", `breakdown`);
+            .attr("id", "breakdown");
+        
+        var barchart = breakdown.append("svg")
+            .attr("width", w/3)
+            .attr("height", h/2 + 2.5 - 40)
+            .attr("y", 15)
+            //.append("xhtml:div")
+            //.attr("id", "chart_area");
+            
 
+        var barchart_dim = barchart.node().getBoundingClientRect();
 
+        var bd_margin = {top: 10, right: 40, bottom: 30, left: 30},
+            bd_width = barchart_dim.width - bd_margin.left - bd_margin.right,
+            bd_height = barchart_dim.height - bd_margin.top - bd_margin.bottom;
 
         
         let bottom_panel = d3.select("body")
@@ -280,7 +291,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
         .attr("max", numMonths)
         .on("input", function() {
           var key = +startMonth + 1*this.value;
-          console.log(key);
+          //console.log(key);
           update(key);
         });
 
@@ -318,8 +329,83 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .attr("d", path);
         }
 
-        function buildBars(state, data) {
+        function buildBars(data) {
+          //console.log(data);
+
+          const bd_data = [ {CO: +data.DM8CO_Concentration, O3: +data.DM8O3_Concentration} ];
+          const bd_labels = ["CO", "O3"];
           
+          // append the svg object to the body of the page
+          var graph = barchart
+            .append("g")
+              .attr("transform", `translate(${bd_margin.left},${bd_margin.top})`)
+              .attr("class", "bd-chart");
+
+          
+          var bd_x = d3.scalePoint()
+              .domain(bd_labels)         // This is the min and the max of the data: 0 to 100 if percentages
+              .range([0, barchart_dim.width*2/3])
+              .padding((barchart_dim.width*2/3)/3);
+
+          graph.append('g')
+              .attr("transform", `translate(0,${barchart_dim.height*2/3})`)
+              .call(d3.axisBottom(bd_x));
+          
+          var bd_y = d3.scaleLinear()
+              //.domain([0, d3.max([bd_data[0].CO, bd_data[0].O3])])
+              .domain([0, 1])  
+              .range([barchart_dim.height*2/3, 0]); 
+
+          graph.append("g")
+              .call(d3.axisLeft(bd_y));
+
+          graph
+            .selectAll("points")
+            .data(bd_data)
+            .enter()
+            .append("circle")
+              .attr("cx", bd_x("CO"))
+              .attr("cy", bd_y(bd_data[0].CO))
+              .attr("r", 7)
+      
+          graph
+            .selectAll("points")
+            .data(bd_data)
+            .enter()
+            .append("circle")
+              .attr("cx", bd_x("O3"))
+              .attr("cy", bd_y(bd_data[0].O3))
+              .attr("r", 7)
+          
+          
+          //randoms = Array.from({length: 1000}, () => Math.random() * Math.random());
+          //Histogram(randoms)
+
+          /*
+          var x = d3.scaleBand()
+                    .range([0, w/3])
+                    .padding(0.1)
+                    .domain([aqi_labels]);
+          
+          var y = d3.scaleLinear()
+                    .range([0, h/2 - 2.5])
+                    .domain(0, d3.max(aqi_data));
+
+          console.log(d3.max(aqi_data));
+          breakdown.selectAll(".bar")
+                    .data([0,1])
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    //.attr("x", function(d) { return x(aqi_labels[d]); })
+                    //.attr("width", x.bandwidth())
+                    //.attr("y", function(d) { console.log(y(aqi_data[d])); return y(aqi_data[d]); })
+                    //.attr("height", function(d) { return (h/2 + 2.5) - y(aqi_data[d]); });
+
+          breakdown.append("g")
+                  .attr("transform", "translate(0," + (h/2) + ")")
+                  .call(d3.axisBottom(x));
+          */
+
         }
 
 
@@ -412,6 +498,10 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
               d3.select("#info-o3").text("Daily Max O3 Conc. (Mean): " + (+stateMetrics.DM8O3_Concentration).toFixed(3) + " ppm");
 
               d3.select("#breakdown").text("POLLUTANTS BREAKDOWN");
+              buildBars(stateMetrics);
+
+
+
 
             })
             .on("mouseout", function(d) {
@@ -425,6 +515,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
               d3.select("#info-o3").text("");
 
               d3.select("#breakdown").text("");
+              d3.selectAll('.bd-chart').remove()
 
             })
             .on("mousedown", function(event, d) {
