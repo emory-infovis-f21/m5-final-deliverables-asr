@@ -198,7 +198,8 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
         var barchart = breakdown.append("svg")
             .attr("width", w/3)
             .attr("height", h/2 + 2.5 - 40)
-            .attr("y", 15)
+            .attr("x", 25)
+            .attr("y", 50)
             //.append("xhtml:div")
             //.attr("id", "chart_area");
             
@@ -339,7 +340,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
           var graph = barchart
             .append("g")
               .attr("transform", `translate(${bd_margin.left},${bd_margin.top})`)
-              .attr("class", "bd-chart");
+              .attr("class", "bd-chart")
 
           
           var bd_x = d3.scalePoint()
@@ -367,6 +368,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
               .attr("cx", bd_x("CO"))
               .attr("cy", bd_y(bd_data[0].CO))
               .attr("r", 7)
+              .attr("fill", "#222222")
       
           graph
             .selectAll("points")
@@ -376,6 +378,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
               .attr("cx", bd_x("O3"))
               .attr("cy", bd_y(bd_data[0].O3))
               .attr("r", 7)
+              .attr("fill", "#222222")
           
           
           //randoms = Array.from({length: 1000}, () => Math.random() * Math.random());
