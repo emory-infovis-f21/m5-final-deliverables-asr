@@ -1,3 +1,6 @@
+<!-- THIS SYSTEM WAS DESIGNED AND DEVELOPED BY RANDY TRUONG
+FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -14,12 +17,13 @@
   </head>
   <body>
     <h1>Visualizing Invisible Human Byproducts: Air Pollution</h1>
-
+    <!--
     <div id="container">
       <span id="date" style='margin: 20px;'></span>
       <input id="slider" type="range" min="0" step="1" value="0">
       
     </div>
+    -->
 
     <script>
 
@@ -79,8 +83,28 @@
 			      .attr("height", "100%")
 			      .attr("fill", "#f3f3f3");
 
-        svg.append("span")
-            .attr("id", "date");
+        svg.append("svg:foreignObject")
+            .attr("width", 60)
+            .attr("height", 20)
+            .attr("y", `${h-50}px`)
+            .attr("x", `${w-75}px`)
+            .append("xhtml:span")
+	          .attr("id", "date");
+
+        svg.append("svg:foreignObject")
+            .attr("width", 200)
+            .attr("height", 30)
+            .attr("y", `${h-30}px`)
+            .attr("x", `${w-180}px`)
+            .append("xhtml:div")
+            .attr("id", "container")
+            .append("xhtml:input")
+            .attr("id", "slider")
+            .attr("type", "range")
+            .attr("min", "0")
+            .attr("step", "1")
+            .attr("value", "0")
+	  
 
 
         // Link slider to updating key
@@ -118,7 +142,7 @@
         function render(map) {
             const projection = d3.geoAlbersUsa()
             .translate([w / 2, h / 2]) // translate to center of screen
-            .scale([1000]); // scale things down so see entire US
+            .scale([900]); // scale things down so see entire US
 
             // Define path generator
             const path = d3.geoPath().projection(projection);
@@ -133,12 +157,29 @@
             .enter().append("path")
             .on("mouseover", tool_tip.show)
             .on("mouseout", tool_tip.hide)
-            .on("click", function(event, d) {
+            .on("mousedown", function(event, d) {
               console.log("This was clicked!");
-
+              console.log(event);
+              //d3.selectAll('.statesView').remove()
+              buildState(1, 2);
+            })
+            .on("mouseup", function(event, d) {
+              d3.selectAll('.statesView').remove();
             })
             .attr("d", path);
         }
+
+        function buildState(state, date) {
+          let svg2 = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h/3)
+                    .attr("class", "statesView");
+          svg2.append("rect")
+              .attr("width", "100%")
+              .attr("height", "100%")
+              .attr("fill", "#f3f3f3");
+        }        
 
         // Update the map with the data for the selected date
         function update(date) {
