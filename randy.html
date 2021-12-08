@@ -74,6 +74,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
         let w = 864; 
 		    let h = 486;
         let svg = d3.select("body")
+            .attr("style", "text-align: center;")
 		        .append("svg")
 		        .attr("width", w)
 		        .attr("height", h);
@@ -123,6 +124,36 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 			      .attr("width", "100%")
 			      .attr("height", "100%")
 			      .attr("fill", "#f3f3f3");
+
+        information.append("svg:foreignObject")
+            .attr("width", w/3)
+            .attr("height", 20)
+            .attr("y", 10)
+            .append("xhtml:span")
+            .attr("id", `info-date`);
+
+        information.append("svg:foreignObject")
+            .attr("width", w/3)
+            .attr("height", 20)
+            .attr("y", 40)
+            .append("xhtml:span")
+            .attr("id", `info-state`);
+        
+        information.append("svg:foreignObject")
+            .attr("width", w/3)
+            .attr("height", 20)
+            .attr("y", 70)
+            .append("xhtml:span")
+            .attr("id", `info-aqi`);
+
+        information.append("svg:foreignObject")
+            .attr("width", w/3)
+            .attr("height", 20)
+            .attr("y", 100)
+            .append("xhtml:span")
+            .attr("id", `info-co`);
+
+        
 
         let breakdown = right_column
 		        .append("svg")
@@ -201,15 +232,14 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 
             svg.call(tool_tip);
             
-
             svg.append("g")
             .attr("class", "states")
             .selectAll("path")
             // NOTE: The filter here is only to make the example simpler
             .data(map.features.filter(d => states.includes(d.properties.name)))
             .enter().append("path")
-            .on("mouseover", tool_tip.show)
-            .on("mouseout", tool_tip.hide)
+            //.on("mouseover", tool_tip.show)
+            //.on("mouseout", tool_tip.hide)
             .attr("d", path);
         }
 
@@ -238,9 +268,6 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
           console.log(specific_data.length);
 
           for (var i = 0; i < specific_data.length; i++) {
-            console.log(specific_data[i]);
-
-
 
             let history = bottom_panel
 		        .append("svg")
@@ -292,7 +319,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
                 .attr("id", `date-${i}`);;
             
             d3.select(`#date-${i}`).text(specific_data[i].Date.slice(0,4));
-            console.log(specific_data[i].Date)
+
           } 
 
         }        
@@ -331,6 +358,9 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
                 return html;
             });
 
+
+             
+
             svg.selectAll("path")
             .attr("fill", function(d) {
                 const rate = getStateMetrics(stats, d.properties.name)[color];
@@ -339,6 +369,21 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
                     rate = -50;
                 }
                 return colorMap(rate);
+            })
+            .on("mouseover", function(d) {
+              const stateMetrics = getStateMetrics(stats, d.properties.name);
+
+              d3.select("#info-date").text("Date: " + stateMetrics.Date);
+              d3.select("#info-state").text("State: " + stateMetrics.State_Fixed);
+              d3.select("#info-aqi").text("Daily AQI (Mean): " + (+stateMetrics.DAILY_AQI_VALUE).toFixed(3));
+              d3.select("#info-co").text("Daily Max CO Conc. (Mean): " + (+stateMetrics.DM8CO_Concentration).toFixed(3));
+
+            })
+            .on("mouseout", function(d) {
+              d3.select("#info-date").text("");
+              d3.select("#info-state").text("");
+              d3.select("#info-aqi").text("");
+              d3.select("#info-co").text("");
             })
             .on("mousedown", function(event, d) {
               d3.select(this)
