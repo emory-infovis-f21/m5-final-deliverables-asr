@@ -1,0 +1,16 @@
+.d3-tip {
+    background: white;
+    opacity: 0.6;
+    border: solid 1px black;
+    border-radius: 4px;
+  }
+
+#date {
+  position: static;
+}
+
+.svg-style {
+  background-color: lightblue;
+  display: block;
+  margin: auto;
+}
