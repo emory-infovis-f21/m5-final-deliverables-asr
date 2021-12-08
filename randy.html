@@ -1,6 +1,3 @@
-<!-- THIS SYSTEM WAS DESIGNED AND DEVELOPED BY RANDY TRUONG
-FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -13,6 +10,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 
     <script src="https://unpkg.com/d3-tip@0.9.1/dist/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
 
     <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 
@@ -52,7 +50,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 
         const numMonths = unique_keys.length-1;
         const startMonth = +unique_keys[0];
-        const valRange = [5, 40];
+        const valRange = [0, 5, 40];
         const color = "Mean_AQI";
         
 
@@ -175,6 +173,8 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .append("xhtml:span")
             .attr("id", `info-o3`);
 
+        d3.select("#information").text("INFORMATION");
+
 
         let breakdown = right_column
 		        .append("svg")
@@ -194,6 +194,8 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .attr("y", 15)
             .append("xhtml:span")
             .attr("id", "breakdown");
+
+        d3.select("#breakdown").text("POLLUTANTS BREAKDOWN");
         
         var barchart = breakdown.append("svg")
             .attr("width", w/3)
@@ -220,6 +222,17 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
           .attr("width", "100%")
           .attr("height", "100%")
           .attr("fill", "#f3f3f3");
+
+        bottom_panel.append("svg:foreignObject")
+            .attr("width", w)
+            .attr("height", 20)
+            .attr("y", 15)
+            .append("xhtml:span")
+            .attr("id", "history");
+
+        d3.select("#history").text("HISTORY");
+
+
         
         let citations = d3.select("body")
             .append("svg")
@@ -248,7 +261,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .attr("y", 30)
             .append("xhtml:span")
             .append("text")
-            .text("d3.js; d3-geo library")
+            .text("d3.js; d3-geo library; d3-legend")
         
 
         citations.append("svg:foreignObject")
@@ -257,7 +270,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .attr("y", 60)
             .append("xhtml:span")
             .append("text")
-            .text("Code referenced and adapted from:")
+            .text("Code Referenced:")
 
         citations.append("svg:foreignObject")
             .attr("width", w/3)
@@ -284,7 +297,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .text("epa.gov (daily air quality data)")
             
         
-	  
+        
 
 
         // Link slider to updating key
@@ -298,11 +311,19 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 
         const colorMap = d3.scaleLinear()
         .domain(valRange)
-        .range(["#a7c9d2", "#111111"]);
+        .range(["#c8e1e8", "#a7c9d2", "#111111"]);
+        
         
 
         render(map_features);
         update(startMonth);
+
+        var legend = d3.legendColor().scale(colorMap);
+
+        svg.append("g")
+            .attr("style", `font-size:${10}px;`)
+            .attr("transform", `translate(${w-65},${(h/2)-40})`)
+            .call(legend);
 
         // Helper function which, given the entire stats data structure, extracts the requested rate for the requested state
         function getStateMetrics(stats, state_name) {
@@ -491,7 +512,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .on("mouseover", function(d) {
               const stateMetrics = getStateMetrics(stats, d.properties.name);
 
-              d3.select("#information").text("INFORMATION");
+              
               d3.select("#info-date").text("Date: " + stateMetrics.Date);
               d3.select("#info-state").text("State: " + stateMetrics.State_Fixed);
               d3.select("#info-aqi").text("Daily CO + O3 AQI (Mean): " + (+stateMetrics.Mean_AQI).toFixed(3));
@@ -500,7 +521,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
               d3.select("#info-co").text("Daily Max CO Conc. (Mean): " + (+stateMetrics.DM8CO_Concentration).toFixed(3) + " ppm");
               d3.select("#info-o3").text("Daily Max O3 Conc. (Mean): " + (+stateMetrics.DM8O3_Concentration).toFixed(3) + " ppm");
 
-              d3.select("#breakdown").text("POLLUTANTS BREAKDOWN");
+              
               buildBars(stateMetrics);
 
 
@@ -508,7 +529,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 
             })
             .on("mouseout", function(d) {
-              d3.select("#information").text("");
+              //d3.select("#information").text("");
               d3.select("#info-date").text("");
               d3.select("#info-state").text("");
               d3.select("#info-aqi").text("");
@@ -517,7 +538,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
               d3.select("#info-co").text("");
               d3.select("#info-o3").text("");
 
-              d3.select("#breakdown").text("");
+              //d3.select("#breakdown").text("");
               d3.selectAll('.bd-chart').remove()
 
             })
