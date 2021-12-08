@@ -83,14 +83,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 			      .attr("height", "100%")
 			      .attr("fill", "#f3f3f3");
 
-        svg.append("svg:foreignObject")
-            .attr("width", 60)
-            .attr("height", 20)
-            .attr("y", `${h-50}px`)
-            .attr("x", `${w-75}px`)
-            .append("xhtml:span")
-	          .attr("id", "date");
-
+        // The slider
         svg.append("svg:foreignObject")
             .attr("width", 200)
             .attr("height", 30)
@@ -104,6 +97,65 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .attr("min", "0")
             .attr("step", "1")
             .attr("value", "0")
+
+        // The date
+        svg.append("svg:foreignObject")
+            .attr("width", 60)
+            .attr("height", 20)
+            .attr("y", `${h-50}px`)
+            .attr("x", `${w-75}px`)
+            .append("xhtml:span")
+	          .attr("id", "date");
+
+        let right_column = d3.select("body")
+		        .append("svg")
+		        .attr("width", w/3)
+		        .attr("height", h)
+            .attr("style", "margin-left: 5px;");
+
+        let information = right_column
+		        .append("svg")
+		        .attr("width", w/3)
+		        .attr("height", h/2 - 2.5)
+            .attr("style", "margin-bottom: 2.5px;");
+
+        information.append("rect")
+			      .attr("width", "100%")
+			      .attr("height", "100%")
+			      .attr("fill", "#f3f3f3");
+
+        let breakdown = right_column
+		        .append("svg")
+		        .attr("width", w/3)
+		        .attr("height", h/2 - 2.5)
+            .attr("y", h/2 + 2.5)
+            .attr("style", "margin-top: 2.5px;");
+
+        breakdown.append("rect")
+			      .attr("width", "100%")
+			      .attr("height", "100%")
+			      .attr("fill", "#f3f3f3");
+        
+        let bottom_panel = d3.select("body")
+            .append("svg")
+		        .attr("width", w)
+		        .attr("height", h/3);
+
+        bottom_panel.append("rect")
+          .attr("width", "100%")
+          .attr("height", "100%")
+          .attr("fill", "#f3f3f3");
+        
+        let citations = d3.select("body")
+            .append("svg")
+		        .attr("width", w/3)
+		        .attr("height", h/3)
+            .attr("style", "margin-left: 5px;");
+        
+        citations.append("rect")
+          .attr("width", "100%")
+          .attr("height", "100%")
+          .attr("fill", "#f3f3f3");
 	  
 
 
@@ -118,13 +170,12 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
 
         const colorMap = d3.scaleLinear()
         .domain(valRange)
-        .range(["#bcd4b5", "#679857", "#636363"]);
+        .range(["#FFFFFF", "#a7c9d2", "#111111", "#679857"]);
         
         
         const tool_tip = d3.tip()
         .attr('class', 'd3-tip')
         .offset([-8, 0]);
-        
 
         render(map_features);
         update(startMonth);
@@ -133,6 +184,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
         function getStateMetrics(stats, state_name) {
             for (var i = 0; i < stats.length; i++) {
                 if (stats[i].State_Fixed == state_name) {
+                  //console.log(stats[i]);
                     return stats[i];
                 }
             }
@@ -148,6 +200,7 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             const path = d3.geoPath().projection(projection);
 
             svg.call(tool_tip);
+            
 
             svg.append("g")
             .attr("class", "states")
@@ -157,28 +210,91 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
             .enter().append("path")
             .on("mouseover", tool_tip.show)
             .on("mouseout", tool_tip.hide)
-            .on("mousedown", function(event, d) {
-              console.log("This was clicked!");
-              console.log(event);
-              //d3.selectAll('.statesView').remove()
-              buildState(1, 2);
-            })
-            .on("mouseup", function(event, d) {
-              d3.selectAll('.statesView').remove();
-            })
             .attr("d", path);
         }
 
-        function buildState(state, date) {
+        // Display state history
+        function buildState(state, data) {
+          /*
           let svg2 = d3.select("body")
-                    .append("svg")
-                    .attr("width", w)
-                    .attr("height", h/3)
-                    .attr("class", "statesView");
+            .append("svg")
+		        .attr("width", w)
+		        .attr("height", h/3);
+
           svg2.append("rect")
+          .attr("width", "100%")
+          .attr("height", "100%")
+          .attr("fill", "#f3f3f3");
+          */
+
+          const passedState = state.State_Fixed;
+          const passedDate = state.Date;
+          
+          const specific_data = co_data.filter(function(row) {
+            return row.State_Fixed === passedState && row.Date.slice(-2) === passedDate.slice(-2)
+          });
+
+          console.log(specific_data);
+          console.log(specific_data.length);
+
+          for (var i = 0; i < specific_data.length; i++) {
+            console.log(specific_data[i]);
+
+
+
+            let history = bottom_panel
+		        .append("svg")
+            .attr("y", h/6 * 1/2)
+		        .attr("width", w/6)
+            .attr("class", "state-hist")
+            .attr("x", i*w/5)
+		        .attr("height", h/6);
+
+            history.append("rect")
               .attr("width", "100%")
               .attr("height", "100%")
               .attr("fill", "#f3f3f3");
+
+            const projection = d3.geoAlbersUsa()
+              .translate([w / 12, h / 12])
+              .scale([1]);
+
+            const path = d3.geoPath().projection(projection);
+
+            var feature = [data];
+            console.log(feature);
+            projection.fitSize([w/6, h/6], feature[0]);
+
+            history.append("g")
+                .attr("class", "states")
+                .selectAll("path")
+                .data(feature)
+                .enter().append("path")
+                .attr("d", path)
+                .attr("fill", function(d) {
+                  const rate = specific_data[i].DAILY_AQI_VALUE
+                  console.log(rate)
+                  
+                  if (rate == undefined) {
+                        rate = -50;
+                  }
+                  return colorMap(rate);
+
+                });
+
+            let caption = bottom_panel.append("svg:foreignObject")
+                .attr("y", h/4 + 10)
+                .attr("width", 60)
+                .attr("class", "state-hist")
+                .attr("x", i*w/5 + 60)
+                .attr("height", 20)
+                .append("xhtml:span")
+                .attr("id", `date-${i}`);;
+            
+            d3.select(`#date-${i}`).text(specific_data[i].Date.slice(0,4));
+            console.log(specific_data[i].Date)
+          } 
+
         }        
 
         // Update the map with the data for the selected date
@@ -220,9 +336,36 @@ FOR CS 485 PROJECT, EMORY UNIVERSITY 2021-->
                 const rate = getStateMetrics(stats, d.properties.name)[color];
                 
                 if (rate == undefined) {
-                    rate = 15;
+                    rate = -50;
                 }
                 return colorMap(rate);
+            })
+            .on("mousedown", function(event, d) {
+              d3.select(this)
+                .style("fill", "#efd06c");
+                /*
+                console.log(this);
+                console.log(this.__data__);
+                console.log(stats);
+                */
+                state_data = getStateMetrics(stats, this.__data__.properties.name);
+                console.log(state_data);
+                
+                buildState(state_data, this.__data__);
+
+            })
+            .on("mouseup", function(event, d) {
+              d3.select(this)
+                .style("fill", function(d) {
+                  const rate = getStateMetrics(stats, d.properties.name)[color];
+                
+                  if (rate == undefined) {
+                      rate = 15;
+                  }
+                  return colorMap(rate);
+
+                });
+              d3.selectAll('.state-hist').remove()
             });
         }
 
