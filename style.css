@@ -14,3 +14,9 @@
   display: block;
   margin: auto;
 }
+
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    text-align: center;
+}

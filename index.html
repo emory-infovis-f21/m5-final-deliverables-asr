@@ -4,62 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Hello World Title</title>
+    <title>CS 485 Project</title>
+<!--    <script src="https://d3js.org/d3.v6.min.js"></script>-->
     <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.js"></script>
+
+    <script src="https://unpkg.com/d3-tip@0.9.1/dist/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="style.css">
   </head>
+
   <body>
-    <h1>Hello World h1</h1>
+    <h1>Visualizing Invisible Human Byproducts: Air Pollution</h1>
 
-    <svg id="my_dataviz" width="400" height="300"></svg>
+    <svg id="bar_chart"></svg>
 
-    <script>
+    <label for="state">Choose a state: </label>
+    <select name="state" id="state" class="state"></select>
 
-      // The svg
-      var svg = d3.select("svg"),
-              width = +svg.attr("width"),
-              height = +svg.attr("height");
+    <script src="abner.js"></script>
 
-      // Map and projection
-      var path = d3.geoPath();
-      var projection = d3.geoMercator()
-              .scale(390)
-              .center([-97,40])
-              .translate([width / 2, height / 2]);
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"></script>
+    <script src="randy.js"></script>
 
-      // Data and color scale
-      var data = d3.map();
-      var colorScale = d3.scaleThreshold()
-              .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
-              .range(d3.schemeBlues[7]);
 
-      // Load external data and boot
-      d3.queue()
-              .defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
-              .defer(d3.csv, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world_population.csv", function(d) { data.set(d.code, +d.pop); })
-              .await(ready);
 
-      function ready(error, topo) {
-
-        // Draw the map
-        svg.append("g")
-                .selectAll("path")
-                .data(topo.features)
-                .enter()
-                .append("path")
-                // draw each country
-                .attr("d", d3.geoPath()
-                        .projection(projection)
-                )
-                // set the color of each country
-                .attr("fill", function (d) {
-                  d.total = data.get(d.id) || 0;
-                  return colorScale(d.total);
-                });
-      }
-
-    </script>
   </body>
 </html>
