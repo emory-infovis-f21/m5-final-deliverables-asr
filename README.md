@@ -4,9 +4,6 @@
 
 > https://emory-infovis-f21.github.io/m5-final-deliverables-asr/
 
-> https://emory-infovis-f21.github.io/m5-final-deliverables-asr/abner
-
-> https://emory-infovis-f21.github.io/m5-final-deliverables-asr/randy
 
 (2) Local system instructions
 > Navigate to this repo folder on your system. In the main directory (where this README is located)
@@ -16,9 +13,7 @@
 > Go to http://localhost:8888/ (this page renders <index.html>)
 
 > To see other pages not <index.html>, simply go to http://localhost:8888/<file.html>
-> e.g. http://localhost:8888/randy.html
-
-> http://localhost:8888/abner.html
+> e.g. http://localhost:8888/index.html
 
 
 
