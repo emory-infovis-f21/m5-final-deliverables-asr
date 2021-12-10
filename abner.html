@@ -31,7 +31,7 @@
       var barHeightMultiplier = 10;
       var margin = {left:50, right:50, top:50, bottom:50};
       var parseDate = d3.timeParse("%Y");
-      var yearArray = [2016, 2017, 2018, 2019, 2020]
+      var yearArray = [2016, 2017, 2018, 2019, 2020];
       var currentState = "Alaska";
 
 
@@ -106,7 +106,6 @@
 
 
                   function initialize(param) {
-                    console.log(data);
                     // Setup the visualization before user interaction
                     var minVal = d3.min(data.filter(function (d) {
                       return d.state === currentState;
@@ -208,7 +207,7 @@
                               return redcolorscale(d.aqi);
                             })
                             .attr("x", function (d, i) {
-                              return (barGap + barWidth) * i;
+                              return i * (1.05*x.bandwidth()) + margin.left;
                             })
                             .attr("y", function (d, i) {
                               return height - (d.aqi * barHeightMultiplier + 2 * margin.bottom);
@@ -226,30 +225,35 @@
                             });
 
                     // This is trying to fix the y scaling of the bars
-                    chartGroup.selectAll("rect")
-                    .data(data.filter(function (d) {
-                      return d.state === currentState;
-                    }))
-                            .enter()
-                            .append("rect")
-                            .attr("height", function (d, i) { return height - y(d.aqi) })
-                            .attr("width", barWidth)
-                            .attr("fill", function(d,i) { return redcolorscale(d.aqi); })
-                            .attr("x", function(d,i) { return i * (x.bandwidth()); })
-                            .attr("y", function(d,i) { return 0; });
+                    // chartGroup.selectAll("rect")
+                    // .data(data.filter(function (d) {
+                    //   return d.state === currentState;
+                    // }))
+                    //         .enter()
+                    //         .append("rect")
+                    //         .attr("height", function (d, i) { return d.aqi * barHeightMultiplier; })
+                    //         .attr("width", barWidth)
+                    //         .attr("fill", function(d,i) { return redcolorscale(d.aqi); })
+                    //         .attr("x", function(d,i) { return i * (1.05*x.bandwidth()) + margin.left; })
+                    //         .attr("y", function(d,i) { return height - (d.aqi * barHeightMultiplier + 2 * margin.bottom); })
+                    // .on("mouseover", function (d) {
+                    //             tooltip.style("opacity", "1")
+                    //                     .style("left", d3.event.pageX + "px")
+                    //                     .style("top", d3.event.pageY + "px")
+                    //                     .style("background", "lightblue");
+                    //
+                    //             tooltip.html("AQI: " + d.aqi);
+                    //           })
+                    //           .on("mouseout", function () {
+                    //             tooltip.style("opacity", "0");
+                    //           });
 
                   }
 
                   // Redraw the bar chart when a new state is selected
                   function update() {
-                    // Randy Line 117
-                    console.log("I am in update()");
                     currentState = document.getElementById('state').value;
-                    console.log(currentState);
-                    // d3.select("#bar_chart").remove();
                     initialize(1);
-
-
                   }
                 }
 
