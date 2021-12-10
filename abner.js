@@ -156,10 +156,10 @@ d3.csv("assets/data/aggregate_states.csv")
                     .call(xAxis);
                 chartGroup.append("text")
                     .attr("class", "y text")
-                    .attr("x", -2*height/5)
+                    .attr("x", -3*height/7)
                     .attr("y", -2*margin.left/3)
                     .attr("transform", "rotate(270)")
-                    .text("AQI");
+                    .text("Yearly AQI");
                 chartGroup.append("text")
                     .attr("class", "x text")
                     .attr("x", width/2)
@@ -192,13 +192,13 @@ d3.csv("assets/data/aggregate_states.csv")
                             .style("top", d3.event.pageY + "px")
                             .style("background", "lightblue");
 
-                        tooltip.html("AQI: " + d.aqi);
+                        tooltip.html("AQI: " + d.aqi.toFixed(3));
                     })
                     .on("mouseout", function () {
                         tooltip.style("opacity", "0");
                     });
 
-                // This is trying to fix the y scaling of the bars
+                // This is attempting to fix the y scaling of the bars
                 // chartGroup.selectAll("rect")
                 // .data(data.filter(function (d) {
                 //   return d.state === currentState;
